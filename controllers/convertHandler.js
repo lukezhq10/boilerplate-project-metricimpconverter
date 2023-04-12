@@ -1,31 +1,55 @@
+function numberStringSplitter(input) {
+  let number = input.match(/[.\d\/]+/g) || ["1"];
+  let string = input.match(/[a-zA-Z]+/g)[0];
+
+  return [number[0], string];
+}
+
+function checkDiv(possibleFraction) {
+  // returns false for double fractions ex. 1/4/3
+  // 1/4 would return ["1", "4"]
+  // 14 would return ["14"]
+  let nums = possibleFraction.split("/");
+  if (nums.length > 2) {
+    return false;
+  }
+  return nums;
+};
+
 function ConvertHandler() {
   
   this.getNum = function(input) {
-    // This regex pattern matches any fractional input, decimal or fractional with a fraction slash
-    const fractionPattern = /^(\d+(\.\d+)?|\d*\/\d+|\d+\s\d*\/\d+)(\s*\w*)$/;
-    const match = input.match(fractionPattern);
-    if (!match) {
-      return 1; // If no valid number is found, return 1 by default
+    let result = numberStringSplitter(input)[0];
+    let nums = checkDiv(result);
+
+    if (!nums){
+      return undefined;
     }
-    // Get the number part of the input and return it
-    return eval(match[1].replace('/', '+')); // Using eval here to handle fractions and decimals correctly
-  };
-  
-  this.getUnit = function(input) {
-    // This regex pattern matches any valid unit input
-    const unitPattern = /gal|lbs|mi|km|l|kg$/i;
-    const match = input.match(unitPattern);
-    let result;
-    if (!match) {
-      return null;
-    } else if (match) { // Get the unit part of the input and return it
-      result = match[0].toLowerCase();
-      if (result === 'l') { // if unit is l, return as uppercase
-        result = 'L';
-      }
+
+    let num1 = nums[0];
+    let num2 = nums[1] || "1"; // if only num1 exists, return 1 so result = (num1)/1
+
+    result = parseFloat(num1) / parseFloat(num2);
+
+    if (isNaN(num1) || isNaN(num2)) { // check if num1 or num2 are not real numbers (Ex. 1.1.1)
+      return undefined;
     }
 
     return result;
+  };
+  
+  this.getUnit = function(input) {
+    let result = numberStringSplitter(input)[1].toLowerCase();
+    const units = ["gal", "l", "lbs", "kg", "mi", "km"];
+    if (!(units.includes(result))) {
+      return undefined;
+    } else {
+      if (result === "l") {
+        result = "L"
+      }
+
+      return result
+    }
   };
 
   
@@ -38,7 +62,6 @@ function ConvertHandler() {
       mi: "km",
       km: "mi"
     };
-
     // Get the corresponding return unit based on the initUnit
     return unitConversions[initUnit];
   };
@@ -69,7 +92,7 @@ function ConvertHandler() {
       km: 1/1.60934
     };
     // Convert the initNum to the corresponding output value using the unitFactors
-    const result = initNum * unitFactors[initUnit];
+    let result = initNum * unitFactors[initUnit];
     // Round the result to 5 decimal places
     return parseFloat(result.toFixed(5));
   };
