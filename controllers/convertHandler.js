@@ -28,7 +28,7 @@ function ConvertHandler() {
     return result;
   };
 
-  // The rest of the functions remain unchanged
+  
   this.getReturnUnit = function(initUnit) {
     const unitConversions = {
       gal: "L",
