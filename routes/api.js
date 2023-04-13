@@ -18,11 +18,11 @@ module.exports = function (app) {
 
       
       if (!initNum && !initUnit) {
-        return res.send("invalid number and unit")
+        res.json({ error: "invalid number and unit" })
       } else if (!initNum) {
-        return res.send("invalid number")
+        res.json({ error: "invalid number" })
       } else if (!initUnit) {
-        return res.send("invalid unit")
+        res.json({ error: "invalid unit" })
       }
       
       return res.json({
